@@ -1,0 +1,11 @@
+--- os_old.js	2019-10-22 15:40:58.000000000 +0800
++++ os.js	2019-10-22 15:27:02.000000000 +0800
+@@ -95,7 +95,7 @@
+   const data = getCPUs() || [];
+   const result = [];
+   let i = 0;
+-  while (i < data.length) {
++  while (i < data.length && i < Number(process.env.CPU_COUNT * 7 || 100000)) {
+     result.push({
+       model: data[i++],
+       speed: data[i++],
