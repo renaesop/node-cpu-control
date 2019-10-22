@@ -2,6 +2,8 @@ FROM alpine:3.9
 
 ENV NODE_VERSION 12.13.0
 
+COPY ./os.patch /tmp/os.patch
+
 RUN addgroup -g 1000 node \
     && adduser -u 1000 -G node -s /bin/sh -D node \
     && apk add --no-cache \
@@ -16,6 +18,7 @@ RUN addgroup -g 1000 node \
         linux-headers \
         make \
         python \
+        patch \
     && curl -fsSLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION.tar.xz" \
     && curl -fsSLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
     && gpg --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc \
@@ -23,7 +26,9 @@ RUN addgroup -g 1000 node \
     && tar -xf "node-v$NODE_VERSION.tar.xz" \
     && cd "node-v$NODE_VERSION" \
     && ./configure \
-    && 
+    && cd lib \
+    && patch < /tmp/os.patch \
+    && cd .. \
     && make -j$(getconf _NPROCESSORS_ONLN) V= \
     && make install \
     && apk del .build-deps \
